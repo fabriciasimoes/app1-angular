@@ -10,16 +10,16 @@ import { FRASES } from './frase-mock'
 export class PainelComponent implements OnInit {
   public frases: Frase[] = FRASES
   public instrucao: string = 'Traduza a frase: ' 
-  public resposta: string 
+  public resposta: string = ''
   
   public rodada: number = 0
   public rodadaFrase: Frase
 
   public progresso: number = 0
+  public tentativas: number = 3
 
   constructor() { 
-    this.rodadaFrase = this.frases[this.rodada]
-    console.log(this.rodadaFrase)
+    this.atualizaRodada()
   }
 
   ngOnInit() {
@@ -32,6 +32,7 @@ export class PainelComponent implements OnInit {
 
   public verificarResposta(): void {
 
+    console.log(this.tentativas)
     if (this.rodadaFrase.frasePtBr == this.resposta){
       alert('A tradução está correta')
       
@@ -40,14 +41,27 @@ export class PainelComponent implements OnInit {
      
       //progresso
       this.progresso = this.progresso + (100 / this.frases.length)
-      console.log(this.progresso)
+   
+      //atualiza o objeto rodadaFrase
+      this.atualizaRodada()    
 
-      //atualiza o objeto da rodada
-      this.rodadaFrase = this.frases[this.rodada]
+      } else {   
+        //diminuir variável tentativas
+        this.tentativas--
 
-      } else{ 
-        alert ('A tradução está errada')
+        if (this.tentativas == -1) {
+          alert ('Você perdeu todas as tentativas!')
+        }
       }
-    
+      console.log(this.tentativas)
+  }
+  
+  public atualizaRodada(): void {
+
+    // define a frase da rodada com base em alguma lógica
+    this.rodadaFrase = this.frases[this.rodada]
+      
+    //limpar resposta
+    this.resposta = ''
   }
 }
