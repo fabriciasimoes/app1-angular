@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 
 import { Frase } from './../shared/frase.model';
 import { FRASES } from './frase-mock'
@@ -7,7 +7,7 @@ import { FRASES } from './frase-mock'
   templateUrl: './painel.component.html',
   styleUrls: ['./painel.component.css']
 })
-export class PainelComponent implements OnInit {
+export class PainelComponent implements OnInit, OnDestroy {
   public frases: Frase[] = FRASES
   public instrucao: string = 'Traduza a frase: ' 
   public resposta: string = ''
@@ -17,12 +17,17 @@ export class PainelComponent implements OnInit {
 
   public progresso: number = 0
   public tentativas: number = 3
+  @Output() public encerrarJogo = new EventEmitter()
 
   constructor() { 
     this.atualizaRodada()
   }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy(){
+    
   }
 
   public atualizaResposta(resposta: Event): void{
@@ -32,9 +37,7 @@ export class PainelComponent implements OnInit {
 
   public verificarResposta(): void {
 
-    console.log(this.tentativas)
-    if (this.rodadaFrase.frasePtBr == this.resposta){
-      alert('A tradução está correta')
+    if (this.rodadaFrase.frasePtBr == this.resposta){      
       
       //trocar pergunta da rodada
       this.rodada++
@@ -42,6 +45,10 @@ export class PainelComponent implements OnInit {
       //progresso
       this.progresso = this.progresso + (100 / this.frases.length)
    
+      //
+      if (this.rodada == this.frases.length) {
+        this.encerrarJogo.emit('vitória')
+      }
       //atualiza o objeto rodadaFrase
       this.atualizaRodada()    
 
@@ -50,10 +57,10 @@ export class PainelComponent implements OnInit {
         this.tentativas--
 
         if (this.tentativas == -1) {
-          alert ('Você perdeu todas as tentativas!')
+          this.encerrarJogo.emit('derrota')
         }
       }
-      console.log(this.tentativas)
+      
   }
   
   public atualizaRodada(): void {
@@ -64,4 +71,5 @@ export class PainelComponent implements OnInit {
     //limpar resposta
     this.resposta = ''
   }
+  
 }
